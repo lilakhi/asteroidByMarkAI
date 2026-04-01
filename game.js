@@ -237,3 +237,76 @@ function initializeAsteroids() {
 
 
 // Add collision detection
+
+function checkCollisions() {
+    // Bullet-asteroid collisions
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        for (let j = asteroids.length - 1; j >= 0; j--) {
+            let bullet = bullets[i];
+            let asteroid = asteroids[j];
+
+            let distance = Math.sqrt(
+                (bullet.x - asteroid.x) ** 2 +
+                (bullet.y - asteroid.y) ** 2
+            );
+
+            if (distance < asteroid.size) {
+                // Create explosion particles
+                createExplosion(asteroid.x, asteroid.y, 8);
+
+                // Update score
+                score += Math.floor(asteroid.size);
+                scoreElement.textContent = score;
+
+                //Split large asteroids
+                if (asteroid.size > 25) {
+                    for (let k = 0; k < 2; k++) {
+                        asteroids.push(createAsteroid(
+                            asteroid.x,
+                            asteroid.y,
+                            asteroid.size *  0.6
+                        ));
+                    }
+                }
+
+                //Remove bullet and asteroid
+                bullets.splice(i, 1);
+                asteroids.splice(j, 1);
+                break;
+            }
+        }
+    }
+
+    //Player-asteroid collision
+    for (let i = asteroids.length - 1; i >= 0; i--) {
+        let asteroid = asteroids[i];
+        let distance = Math.sqrt(
+            (player.x - asteroid.x) ** 2 +
+            (player.y - asteroid.y) ** 2
+        );
+
+        if (distance < asteroid.size + player.size) {
+            // Player hit
+            lives--;
+            livesElement.textContent = lives;
+
+            // Create explosion
+            createExplosion(player.x, player.y, 12);
+
+            // Reset player position
+            player.x = canvas.width / 2;
+            player.y = canvas.height / 2;
+            player.velX = 0;
+            player.velY = 0;
+
+            // Check game over
+            if (lives <= 0) {
+                gameState = 'gameOver';
+                finalScoreElement.textContent = score;
+                gameOverElement.style.display = 'block';
+            }
+
+            break;
+        }
+    }
+}
