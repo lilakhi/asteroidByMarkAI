@@ -44,7 +44,7 @@ document.addEventListener('keyup', (e) => {
 
 function updatePlayer() {
     // Rotation
-    if (keys['a'] || keys['arrowLeft']) {
+    if (keys['a'] || keys['arrowleft']) {
         player.angle -= 0.1;
     }
     if (keys ['d'] || keys['arrowright']) {
@@ -166,7 +166,7 @@ function createAsteroid(x, y, size) {
     };
 }
 
-function generateAsteroidVerticies() {
+function generateAsteroidVertices() {
     let vertices = [];
     let numVertices = 8 + Math.floor(Math.random() * 4);
 
