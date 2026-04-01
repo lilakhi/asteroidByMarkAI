@@ -71,6 +71,8 @@ function updatePlayer() {
     if (player.y > canvas.height) player.y = 0;
 }
 
+// Draw Ship
+
 function drawPlayer() {
     ctx.save();
     ctx.translate(player.x, player.y);
@@ -141,10 +143,97 @@ function updateBullets() {
 }
 
 function drawBullets() {
-    ctx.fillStyle = '#ffff00'
+    ctx.fillStyle = '#ffff00';
     bullets.forEach(bullet => {
         ctx.beginPath();
         ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2);
         ctx.fill();
     });
 }
+
+// Generate Asteroids
+
+function createAsteroid(x, y, size) {
+    return {
+        x: x || Math.random() * canvas.width,
+        y: y || Math.random() * canvas.height,
+        velX: (Math.random() - 0.5) * ASTEROID_SPEED,
+        velY: (Math.random() - 0.5) * ASTEROID_SPEED,
+        size: size || Math.random() * 30 + 20,
+        angle: 0,
+        rotation: (Math.random() - 0.5) * 0.1,
+        vertices: generateAsteroidVertices()
+    };
+}
+
+function generateAsteroidVerticies() {
+    let vertices = [];
+    let numVertices = 8 + Math.floor(Math.random() * 4);
+
+    for (let i = 0; i < numVertices; i++) {
+        let angle = (i / numVertices) * Math.PI * 2;
+        let radius = 0.7 + Math.random() * 0.6; // Random radius variation
+        vertices.push({
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius
+         });
+    }
+    
+    return vertices;
+}
+
+function updateAsteroids() {
+    asteroids.forEach(asteroid => {
+        asteroid.x += asteroid.velX;
+        asteroid.y += asteroid.velY;
+        asteroid.angle += asteroid.rotation;
+
+        //Screen wrapping
+        if (asteroid.x < -asteroid.size) asteroid.x = canvas.width + asteroid.size;
+        if (asteroid.x > canvas.width + asteroid.size) asteroid.x = -asteroid.size;
+        if (asteroid.y < -asteroid.size) asteroid.y = canvas.height + asteroid.size;
+        if (asteroid.y > canvas.height + asteroid.size) asteroid.y = -asteroid.size;
+    });
+}
+
+function drawAsteroids() {
+    ctx.strokeStyle = '#888';
+    ctx.lineWidth = 2;
+
+    asteroids.forEach(asteroid => {
+        ctx.save();
+        ctx.translate(asteroid.x, asteroid.y);
+        ctx.rotate(asteroid.angle);
+        ctx.scale(asteroid.size, asteroid.size);
+
+        ctx.beginPath();
+        asteroid.vertices.forEach((vertex, i) => {
+            if (i === 0) {
+                ctx.moveTo(vertex.x, vertex.y);
+            } else {
+                ctx.lineTo(vertex.x, vertex.y);
+            }
+        });
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.restore();
+    });
+}
+
+//Initialize some asteroids
+function initializeAsteroids() {
+    for (let i = 0; i < 5; i++) {
+        // Make sure asteroids don't spawn on player
+        let x, y;
+        do {
+            x = Math.random() * canvas.width;
+            y = Math.random() * canvas.height;
+        } while (Math.sqrt((x - player.x) ** 2 + (y - player.y) ** 2) < 100);
+
+        asteroids.push(createAsteroid(x, y));
+    }
+}
+
+
+// Add collision detection
