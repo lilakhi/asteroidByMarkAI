@@ -1,6 +1,6 @@
 // Game state and configuration
 const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d')
+const ctx = canvas.getContext('2d');
 const scoreElement = document.getElementById('score');
 const livesElement = document.getElementById('lives');
 const gameOverElement = document.getElementById('gameOver');
@@ -66,9 +66,10 @@ function updatePlayer() {
 
     // Screen wrapping
     if (player.x < 0) player.x = canvas.width;
-    if (player.x > canvas.width) player.x = 0
-    if (player.y < 0) player.y = canvas.height
-    if (player.y > canvas.height) player.y = 0
+    if (player.x > canvas.width) player.x = 0;
+    if (player.y < 0) player.y = canvas.height;
+    if (player.y > canvas.height) player.y = 0;
+}
 
 function drawPlayer() {
     ctx.save();
@@ -100,4 +101,3 @@ function drawPlayer() {
     ctx.restore();
 }
 
-}
