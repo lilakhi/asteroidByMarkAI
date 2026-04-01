@@ -1,3 +1,8 @@
+// Performance monitoring
+let fps = 0
+let lastFpsUpdate = Date.now();
+let frameCount = 0;
+
 // Game state and configuration
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
@@ -360,6 +365,16 @@ function drawParticles() {
 // Game loops
 
 function gameLoop() {
+    
+    // performance monitoring
+    frameCount++;
+    if (Date.now() - lastFpsUpdate > 1000) {
+        fps = frameCount;
+        frameCount = 0;
+        lastFpsUpdate = Date.now();
+    }
+
+    // Game loop
     if (gameState === 'playing') {
         // Update
         updatePlayer();
