@@ -101,3 +101,50 @@ function drawPlayer() {
     ctx.restore();
 }
 
+
+// Shooting
+let lastShotTime = 0;
+const SHOT_COOLDOWN = 100; //milliseconds
+
+function handleShooting() {
+    if ((keys[' '] || keys['spacebar']) && Date.now() - lastShotTime > SHOT_COOLDOWN) {
+        bullets.push({
+            x: player.x + Math.cos(player.angle) * player.size,
+            y: player.y + Math.sin(player.angle) * player.size,
+            velX: Math.cos(player.angle) * BULLET_SPEED,
+            velY: Math.sin(player.angle) * BULLET_SPEED,
+            life: 60 // bullets disappear after 60 frames
+        });
+        lastShotTime = Date.now();
+    }
+}
+
+function updateBullets() {
+    for (let i = bullets.length - 1; i >= 0; i--) {
+        let bullet = bullets[i];
+
+        bullet.x += bullet.velX;
+        bullet.y += bullet.velY;
+        bullet.life--;
+
+        // Screen wrapping
+        if (bullet.x < 0) bullet.x = canvas.width;
+        if (bullet.x > canvas.width) bullet.x = 0;
+        if (bullet.y < 0) bullet.y = canvas.height;
+        if (bullet.y > canvas.height) bullet.y = 0;
+
+        // Remove old bullets
+        if (bullet.life <= 0) {
+            bullets.splice(i, 1);
+        }
+    }
+}
+
+function drawBullets() {
+    ctx.fillStyle = '#ffff00'
+    bullets.forEach(bullet => {
+        ctx.beginPath();
+        ctx.arc(bullet.x, bullet.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+    });
+}
