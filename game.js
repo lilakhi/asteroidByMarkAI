@@ -310,3 +310,112 @@ function checkCollisions() {
         }
     }
 }
+
+
+// Visuals
+function createExplosion(x, y, count) {
+    for (let i = 0; i < count; i++) {
+        particles.push({
+            x: x,
+            y: y,
+            velX: (Math.random() - 0.5) * 8,
+            velY: (Math.random() - 0.5) * 8,
+            life: 30,
+            maxLife: 30,
+            color: `hsl(${Math.random() * 60 + 10}, 100%, 50%)`
+        });
+    }
+}
+
+
+function updateParticles() {
+    for (let i = particles.length - 1; i >= 0; i--) {
+        let particle = particles[i];
+
+        particle.x += particle.velX;
+        particle.y += particle.velY;
+        particle.velX *= 0.95;
+        particle.velY *= 0/95;
+        particle.life--;
+
+        if (particle.life <= 0) {
+            particles.splice(i, 1);
+        }
+    }
+}
+
+function drawParticles() {
+    particles.forEach(particle => {
+        let alpha = particle.life / particle.maxLife;
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.fillStyle = particle.color;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, 3, 0, Math.PI * 2);
+        ctx.fill()
+        ctx.restore();
+    });
+}
+
+// Game loops
+
+function gameLoop() {
+    if (gameState === 'playing') {
+        // Update
+        updatePlayer();
+        handleShooting();
+        updateBullets();
+        updateAsteroids();
+        updateParticles();
+        checkCollisions();
+
+        // Spawn new asteroids if needed
+        if (asteroids.length === 0) {
+            for (let i = 0; i < Math.min(5 + Math.floor(score / 100), 10); i++) {
+                let x, y;
+                do {
+                    x = Math.random() * canvas.width;
+                    y = Math.random() * canvas.height;
+                } while (Math.sqrt((x - player.x) ** 2 + (y - player.y) ** 2) < 150);
+
+                asteroids.push(createAsteroid(x, y));
+            }
+        }
+    }
+
+    // Clear canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw everything
+    drawPlayer();
+    drawBullets();
+    drawAsteroids();
+    drawParticles();
+
+    requestAnimationFrame(gameLoop);
+}
+
+function restartGame() {
+    gameState = 'playing';
+    score = 0;
+    lives = 3;
+    bullets = [];
+    asteroids = [];
+    particles = [];
+
+    player.x = canvas.width / 2;
+    player.y = canvas.height / 2;
+    player.velX = 0;
+    player.velY = 0;
+    player.angle = 0;
+
+    scoreElement.textContent = score;
+    livesElement.textContent = lives;
+    gameOverElement.style.display = 'none';
+
+    initializeAsteroids();
+}
+
+// start the game
+initializeAsteroids();
+gameLoop();
